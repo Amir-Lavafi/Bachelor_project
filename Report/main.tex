@@ -1,0 +1,132 @@
+\documentclass[12pt, a4paper]{report}
+
+ 
+\usepackage[extrafootnotefeatures]{xepersian}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, linkcolor=black, urlcolor=darkgray, citecolor=black]{hyperref}
+\usepackage{listings}
+\usepackage{xcolor} 
+\usepackage{afterpage}
+\usepackage{setspace}
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+
+\onehalfspacing
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	language=Python
+}
+
+\lstset{style=mystyle}
+\renewcommand{\labelitemi}{-}
+
+\settextfont{XB Niloofar}
+
+\newcommand\blankpage{%
+	\null
+	\thispagestyle{empty}%
+	\addtocounter{page}{-1}%
+	\newpage}
+	
+	
+\begin{document}
+	\blankpage
+
+	\begin{center}
+		\includegraphics{besm1.jpg}
+	\end{center}
+	\thispagestyle{empty}
+	\begin{center}
+		\includegraphics[height=3cm]{iut_logo.png}
+		\vspace{0.4cm}
+		
+		\textbf{دانشگاه صنعتی اصفهان}\\
+		\vspace{0.4cm}
+		
+		{\large
+			
+			دانشکده مهندسی برق و کامپیوتر
+		}
+		\vspace{2cm}
+		
+		{\Large
+			\textbf{بررسی و تحلیل حریم خصوصی در شبکه بلاکچین}\\
+		}
+		\vspace{3cm}
+		
+		{\Large
+			پایان‌نامه کارشناسی مهندسی کامپیوتر - نرم افزار\\
+		}
+		\vspace{1cm}
+		
+		{\large
+			\textbf{امیرحسین لوافی}\\
+		}
+		\vspace{3cm}
+		
+		{\large
+
+		}
+		\vspace{0.5cm}
+		
+		{\large
+			\textbf{دکتر مجتبی خلیلی}\\
+		}
+		\vspace{1cm}
+		
+		\textbf{1404}
+		
+	\end{center}
+
+	\pagebreak
+
+
+
+
+	\tableofcontents
+	\newpage
+	
+	\include{chapters/introduction}
+	\include{chapters/analysis_vulnerabilities} 
+	\include{chapters/onchain_solutions} 
+	
+	\include{chapters/mixer_simulation}
+	
+	\include{chapters/offchain_solutions}
+	\include{chapters/case_study_monero} 
+	\include{chapters/conclusion} 
+	
+	
+	\printbibliography[title={منابع}]
+	
+	%\appendix
+	%\renewcommand{\chaptername}{پیوست}
+	%\renewcommand{\thechapter}{\Asbuk{chapter}}
+	
+	%\include{chapters/appendix_basics}
+
+	
+\end{document}

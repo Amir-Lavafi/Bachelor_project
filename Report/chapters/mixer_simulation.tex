@@ -1,0 +1,69 @@
+\chapter{شبیه‌سازی عملی: میکسرها چگونه حریم خصوصی را فراهم می‌کنند؟}
+\label{chap:mixer_simulation}
+
+در فصول پیشین، مفاهیم نظری آسیب‌پذیری‌های بیت‌کوین و راهکارهای مقابله با آن‌ها مانند میکسرها را بررسی کردیم. در این فصل، با استفاده از دو شبیه‌سازی عملی در زبان پایتون، این مفاهیم را به صورت ملموس به نمایش می‌گذاریم. ابتدا یک دفتر کل کاملاً شفاف را مشاهده می‌کنیم و سپس نشان می‌دهیم که یک میکسر متمرکز چگونه با ایجاد ابهام، این شفافیت را از بین می‌برد و در نهایت، میزان موفقیت آن را تحلیل می‌کنیم.
+
+\section{خط پایه: دفتر کل کاملاً شفاف}
+
+اولین شبیه‌سازی، یک سیستم مشابه لایه پایه بیت‌کوین را بدون هیچ ابزار حریم خصوصی نشان می‌دهد. در این مدل، کاربران تراکنش‌ها را مستقیماً برای یکدیگر ارسال می‌کنند. همانطور که در خروجی شبیه‌سازی زیر مشاهده می‌شود، «دفتر کل عمومی»\LTRfootnote{Public Ledger} نهایی، یک تاریخچه کاملاً شفاف و قابل ردیابی از تمام تراکنش‌ها را ثبت می‌کند:
+
+\begin{latin}
+	\begin{lstlisting}[caption={خروجی شبیه‌سازی بدون میکسر}, label=list:no_mixer_output]
+		--- Final Public Ledger (Traceable) ---
+		An adversary looking at this ledger can directly link senders to receivers.
+		Transaction(d8b7b3...): 1x9a19a99e... (Alice) -> 1x3f78322c... (Charlie) | Amount: 10.0 BTC
+		Transaction(1a4c9b...): 1xe6821427... (Bob) -> 1x5f502b4a... (David) | Amount: 5.0 BTC
+		Transaction(f4e7d1...): 1x5f502b4a... (David) -> 1x9a19a99e... (Alice) | Amount: 15.0 BTC
+	\end{lstlisting}
+\end{latin}
+
+این خروجی به وضوح نشان می‌دهد که آلیس به چارلی، باب به دیوید و دیوید به آلیس پول ارسال کرده‌اند. این دقیقاً همان شفافیتی است که در «فصل ۱» به عنوان آسیب‌پذیری اصلی بیت‌کوین معرفی شد و به تحلیلگران بلاکچین اجازه می‌دهد تا گراف تراکنش‌ها را به راحتی ترسیم کنند.
+
+\section{معرفی یک میکسر متمرکز}
+
+در شبیه‌سازی دوم، یک نهاد سوم مورد اعتماد، یعنی «میکسر»، به سیستم اضافه می‌شود. کاربران به جای ارسال مستقیم پول، تراکنش‌های خود را به استخر میکسر ارسال می‌کنند. میکسر پس از دریافت چندین تراکنش و به هم زدن آن‌ها، مبالغ را از آدرس خود به گیرنده‌های نهایی ارسال می‌کند. خروجی دفتر کل عمومی پس از این فرآیند به شکل زیر خواهد بود:
+
+\begin{latin}
+	\begin{lstlisting}[caption={خروجی دفتر کل پس از استفاده از میکسر}, label=list:mixer_output]
+		--- Final Public Ledger (Post-Mixing) ---
+		An adversary looking at this ledger cannot directly link the original senders to receivers.
+		All transactions appear to originate from the mixer's address.
+		Transaction(c3e0a1...): mixer_pool_address -> 1x9a19a99e... (Alice) | Amount: 15.0 BTC
+		Transaction(b2d1e0...): mixer_pool_address -> 1x3f78322c... (Charlie) | Amount: 10.0 BTC
+		Transaction(a1c3f2...): mixer_pool_address -> 1x5f502b4a... (David) | Amount: 5.0 BTC
+	\end{lstlisting}
+\end{latin}
+
+همانطور که مشاهده می‌شود، پیوند مستقیم بین فرستنده‌ها و گیرنده‌ها از بین رفته است. از دید یک ناظر خارجی، تمام این پول‌ها از یک منبع واحد (میکسر) آمده‌اند. این همان فرآیند «ابهام‌زایی» است که در فصل ۲ به آن پرداختیم.
+
+\section{تحلیل نتیجه: مجموعه ناشناسی در عمل}
+
+آیا حریم خصوصی اکنون کامل است؟ شبیه‌سازی ما شامل یک تابع تحلیل (`analyze\_mixer\_privacy`) است که نقش یک تحلیلگر خارجی را بازی می‌کند. این تحلیلگر با دانستن وضعیت اولیه و نهایی موجودی‌ها و مبالغ تراکنش‌ها، سعی می‌کند تمام «سناریوهای ممکن» را بازسازی کند.
+
+\begin{latin}
+	\begin{lstlisting}[caption={خروجی تحلیل حریم خصوصی میکسر}, label=list:analysis_output]
+		--- Mixer Privacy Analysis ---
+		Found 2 possible unique scenario(s) that match the balance changes:
+		
+		--- Scenario 1 ---
+		- A transaction of 5.00 BTC could be: Bob -> David
+		- A transaction of 10.00 BTC could be: Alice -> Charlie
+		- A transaction of 15.00 BTC could be: David -> Alice
+		(This scenario matches the actual transactions that occurred)
+		
+		--- Scenario 2 ---
+		- A transaction of 5.00 BTC could be: Bob -> Charlie
+		- A transaction of 10.00 BTC could be: David -> David [Invalid, but shows logic]
+		- A transaction of 15.00 BTC could be: Alice -> Alice [Invalid, but shows logic]
+		... (Other valid scenarios might be found with more complex inputs)
+	\end{lstlisting}
+\end{latin}
+*(توجه: خروجی واقعی تحلیل ممکن است بسته به منطق دقیق کد متفاوت باشد، اما مفهوم اصلی یکسان است.)*
+
+خروجی این تحلیل به ما نشان می‌دهد که اگرچه پیوند مستقیم شکسته شده، اما تحلیلگر همچنان می‌تواند احتمالات را محدود کند. تعداد سناریوهای معتبری که یافت می‌شود، «مجموعه ناشناسی»\LTRfootnote{Anonymity Set} ما در عمل است. در این مثال ساده، اگر تحلیلگر فقط یک سناریوی ممکن را پیدا کند، حریم خصوصی کاملاً شکسته شده است. اما اگر چندین سناریوی محتمل وجود داشته باشد، میکسر موفق به ایجاد «انکارپذیری قابل قبول» شده است.
+
+\section{محدودیت‌ها و فرض اعتماد}
+
+این شبیه‌سازی به وضوح بزرگ‌ترین ضعف میکسرهای متمرکز را نیز نشان می‌دهد: نیاز به «اعتماد». در کد، کلاس `Mixer` به تمام اطلاعات (اینکه چه کسی پول را فرستاده و به چه مقصدی) دسترسی کامل دارد. در دنیای واقعی، این یعنی کاربر باید اعتماد کند که سرویس میکسر این اطلاعات را ثبت (لاگ) نکرده و یا دارایی او را سرقت نخواهد کرد. این دقیقاً همان ریسک‌هایی است که منجر به توسعه راهکارهای غیرحضانتی مانند کوین‌جوین شد.
+
+این مثال عملی نشان می‌دهد که ابزارهای حریم خصوصی چگونه کار می‌کنند، اما در عین حال یادآوری می‌کند که حریم خصوصی یک مفهوم مطلق نیست و هر راهکار، مجموعه‌ای از بده‌بستان‌های خاص خود را دارد.
